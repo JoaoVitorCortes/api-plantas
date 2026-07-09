@@ -2,7 +2,7 @@
 
 Uma API REST para cadastrar, organizar e acompanhar as necessidades de cuidado das suas plantas, com cálculo automático de quando cada uma precisa ser regada.
 
-Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **MongoDB (via Beanie ODM)**, seguindo uma arquitetura em camadas.
+Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **MongoDB (via Beanie ODM)**, seguindo uma arquitetura em camadas. Ademais, uma interface gráfica **HTML** gerado via Claude IA para demonstrações das requisições.
 
 ---
 
@@ -209,8 +209,7 @@ POST /plantas/
 - [ ] Busca de espécies em catálogo externo (informações de cuidado de plantas que o usuário ainda não possui)
 - [ ] Upload e associação de imagens às plantas cadastradas
 - [ ] Autenticação de usuários, para suportar múltiplos catálogos pessoais
-- [ ] Interface visual (web ou mobile) como alternativa ao Swagger
-
+      
 ---
 
 ## 📝 Licença
