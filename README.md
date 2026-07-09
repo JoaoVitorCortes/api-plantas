@@ -2,7 +2,7 @@
 
 Uma API REST para cadastrar, organizar e acompanhar as necessidades de cuidado das suas plantas, com cálculo automático de quando cada uma precisa ser regada.
 
-Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **MongoDB (via Beanie ODM)**, seguindo uma arquitetura em camadas. Ademais, uma interface gráfica **HTML** gerado via Claude IA para demonstrações das requisições.
+Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **MongoDB (via Beanie ODM)**, seguindo uma arquitetura em camadas. Ademais, uma [interface gráfica **HTML** gerado via Claude IA](https://cove-addition-june-prev.trycloudflare.com/) para demonstrações das requisições.
 
 ---
 
