@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Herbário Digital · Catálogo de Plantas</title>
+<style>
+  /* ======================================================================
+     HERBÁRIO DIGITAL — estética de almanaque botânico
+     Papel creme · verde-floresta · terracota para sinalizar sede
+     ====================================================================== */
+  :root{
+    --paper:      #f3ece0;
+    --paper-2:    #fbf7ee;
+    --card:       #fdfaf3;
+    --ink:        #263528;
+    --ink-soft:   #52604f;
+    --ink-faint:  #8a917f;
+    --line:       #e2d8c6;
+    --green:      #3f6b4a;
+    --green-deep: #2c4d36;
+    --green-soft: #e7efe3;
+    --gold:       #b98b3e;
+    --terra:      #c26a45;
+    --terra-soft: #f6e3d6;
+    --shadow:     0 1px 2px rgba(38,53,40,.06), 0 10px 30px -12px rgba(38,53,40,.22);
+    --radius:     18px;
+    --serif:      Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --sans:       "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 500px at 15% -10%, #ffffff55, transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, var(--green-soft), transparent 55%),
+      var(--paper);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* grão de papel sutil */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+  .wrap{ position:relative; z-index:1; max-width:1160px; margin:0 auto; padding:0 22px 80px; }
+
+  /* ------------------------------- HERO ------------------------------- */
+  header.hero{ padding:46px 0 26px; text-align:center; position:relative; }
+  .kicker{
+    font-family:var(--sans); font-size:12px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin-bottom:12px;
+  }
+  .hero h1{
+    font-family:var(--serif); font-weight:400; font-size:clamp(38px,6vw,64px);
+    line-height:1; margin:0; color:var(--green-deep); letter-spacing:-.5px;
+  }
+  .hero h1 em{ font-style:italic; color:var(--green); }
+  .hero p.sub{
+    margin:16px auto 0; max-width:520px; color:var(--ink-soft); font-size:16px; line-height:1.55;
+  }
+  .rule{
+    display:flex; align-items:center; justify-content:center; gap:14px; margin:26px auto 4px; color:var(--gold);
+  }
+  .rule::before,.rule::after{ content:""; height:1px; width:80px; background:linear-gradient(90deg,transparent,var(--line)); }
+  .rule span{ font-size:18px; }
+
+  /* live stats */
+  .stats{ display:flex; gap:26px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+  .stat{ text-align:center; }
+  .stat b{ font-family:var(--serif); font-size:30px; color:var(--green-deep); display:block; line-height:1; }
+  .stat small{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+  .stat.thirsty b{ color:var(--terra); }
+
+  /* ----------------------------- TOOLBAR ------------------------------ */
+  .toolbar{
+    position:sticky; top:14px; z-index:20;
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    background:rgba(253,250,243,.82); backdrop-filter:blur(10px);
+    border:1px solid var(--line); border-radius:16px; padding:12px 14px;
+    box-shadow:var(--shadow); margin-top:30px;
+  }
+  .search{ position:relative; flex:1 1 260px; min-width:200px; }
+  .search svg{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-faint); }
+  .search input{
+    width:100%; border:1px solid var(--line); background:var(--paper-2); color:var(--ink);
+    border-radius:11px; padding:12px 14px 12px 42px; font-size:15px; font-family:var(--sans); outline:none;
+    transition:border-color .18s, box-shadow .18s;
+  }
+  .search input:focus{ border-color:var(--green); box-shadow:0 0 0 3px var(--green-soft); }
+  .search input::placeholder{ color:var(--ink-faint); }
+
+  .toggle{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer; user-select:none;
+    border:1px solid var(--line); background:var(--paper-2); border-radius:11px; padding:10px 14px;
+    font-size:14px; color:var(--ink-soft); transition:all .18s; white-space:nowrap;
+  }
+  .toggle:hover{ border-color:var(--terra); }
+  .toggle.on{ background:var(--terra-soft); border-color:var(--terra); color:var(--terra); font-weight:600; }
+  .toggle .dot{ width:9px; height:9px; border-radius:50%; background:var(--ink-faint); transition:background .18s; }
+  .toggle.on .dot{ background:var(--terra); box-shadow:0 0 0 3px #c26a4533; }
+
+  .btn{
+    font-family:var(--sans); font-size:15px; font-weight:600; border:none; cursor:pointer;
+    border-radius:11px; padding:12px 20px; transition:transform .12s, box-shadow .18s, background .18s;
+    display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--green-deep); color:#fdfaf3; box-shadow:0 6px 16px -6px #2c4d3688; }
+  .btn-primary:hover{ background:var(--green); }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--green); color:var(--green-deep); }
+
+  /* ------------------------------ GRID -------------------------------- */
+  .grid{
+    margin-top:26px; display:grid; gap:20px;
+    grid-template-columns:repeat(auto-fill, minmax(268px,1fr));
+  }
+  .card{
+    position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 20px 16px; box-shadow:var(--shadow); overflow:hidden;
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes rise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  .card::after{ /* costura decorativa de herbário */
+    content:""; position:absolute; inset:7px; border:1px dashed #d9cdb8; border-radius:12px; pointer-events:none; opacity:.6;
+  }
+  .card > *{ position:relative; }
+  .card-top{ display:flex; align-items:flex-start; gap:14px; }
+  .avatar{
+    flex:none; width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
+    font-size:30px; background:radial-gradient(circle at 35% 30%, #ffffff, var(--green-soft));
+    border:1px solid var(--line); box-shadow:inset 0 0 0 4px #ffffff88;
+  }
+  .card h3{ font-family:var(--serif); font-weight:400; font-size:22px; margin:2px 0 2px; color:var(--green-deep); line-height:1.1; }
+  .card .species{ font-style:italic; color:var(--ink-faint); font-size:13.5px; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+    padding:5px 11px; border-radius:999px; margin-top:12px;
+  }
+  .badge.thirsty{ background:var(--terra-soft); color:var(--terra); }
+  .badge.ok{ background:var(--green-soft); color:var(--green); }
+  .badge .pulse{ width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .badge.thirsty .pulse{ animation:pulse 1.4s infinite; }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 0 0 0 #c26a4566; } 50%{ box-shadow:0 0 0 5px #c26a4500; } }
+
+  .attrs{ margin-top:14px; display:flex; flex-direction:column; gap:7px; }
+  .attr{ display:flex; align-items:center; gap:9px; font-size:13.5px; color:var(--ink-soft); }
+  .attr .ic{ width:22px; text-align:center; font-size:15px; }
+  .obs{ margin-top:12px; font-size:12.5px; color:var(--ink-faint); font-style:italic; line-height:1.5;
+        border-left:2px solid var(--line); padding-left:10px; }
+
+  .actions{ margin-top:16px; padding-top:14px; border-top:1px solid var(--line); display:flex; gap:8px; align-items:center; }
+  .water-btn{
+    flex:1; background:var(--green-soft); color:var(--green-deep); border:1px solid #cfe0ce;
+    border-radius:10px; padding:10px; font-weight:600; font-size:14px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:7px; transition:all .16s;
+  }
+  .water-btn:hover{ background:var(--green); color:#fff; border-color:var(--green); }
+  .icon-btn{
+    width:40px; height:40px; flex:none; border:1px solid var(--line); background:var(--paper-2);
+    border-radius:10px; cursor:pointer; font-size:16px; display:grid; place-items:center; transition:all .16s; color:var(--ink-soft);
+  }
+  .icon-btn:hover{ border-color:var(--green); color:var(--green-deep); }
+  .icon-btn.danger:hover{ border-color:var(--terra); color:var(--terra); background:var(--terra-soft); }
+
+  /* splash de água ao regar */
+  .splash{ position:absolute; inset:0; pointer-events:none; display:grid; place-items:center; font-size:40px; opacity:0; }
+  .splash.go{ animation:splash .9s ease-out; }
+  @keyframes splash{ 0%{ opacity:0; transform:scale(.4) translateY(-10px);} 25%{ opacity:1;} 100%{ opacity:0; transform:scale(1.5) translateY(6px);} }
+
+  /* --------------------------- ESTADOS -------------------------------- */
+  .empty,.loading{ text-align:center; padding:80px 20px; color:var(--ink-faint); }
+  .empty .big,.loading .big{ font-size:56px; margin-bottom:14px; display:block; }
+  .empty h2{ font-family:var(--serif); font-weight:400; color:var(--green-deep); font-size:24px; margin:0 0 8px; }
+  .loading .big{ animation:sway 2s ease-in-out infinite; }
+  @keyframes sway{ 0%,100%{ transform:rotate(-6deg);} 50%{ transform:rotate(6deg);} }
+
+  /* ---------------------------- MODAL --------------------------------- */
+  .overlay{
+    position:fixed; inset:0; z-index:60; background:rgba(38,53,40,.42); backdrop-filter:blur(3px);
+    display:grid; place-items:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .22s;
+  }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .modal{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:22px; width:min(500px,100%);
+    max-height:92vh; overflow:auto; box-shadow:0 30px 80px -20px rgba(38,53,40,.5);
+    transform:translateY(12px) scale(.98); transition:transform .22s;
+  }
+  .overlay.show .modal{ transform:none; }
+  .modal-head{ padding:24px 26px 8px; }
+  .modal-head .kicker{ margin-bottom:6px; }
+  .modal-head h2{ font-family:var(--serif); font-weight:400; font-size:27px; color:var(--green-deep); margin:0; }
+  form{ padding:8px 26px 26px; }
+  .field{ margin-top:16px; }
+  .field label{ display:block; font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; }
+  .field input,.field textarea{
+    width:100%; border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:11px; padding:12px 14px; font-size:15px; font-family:var(--sans); outline:none; transition:border-color .16s, box-shadow .16s;
+  }
+  .field input:focus,.field textarea:focus{ border-color:var(--green); box-shadow:0 0 0 3px var(--green-soft); }
+  .field textarea{ resize:vertical; min-height:64px; }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .modal-actions{ margin-top:24px; display:flex; gap:10px; justify-content:flex-end; }
+  .close-x{ position:absolute; }
+
+  /* ---------------------------- TOASTS -------------------------------- */
+  .toasts{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:90; display:flex; flex-direction:column; gap:10px; align-items:center; }
+  .toast{
+    background:var(--green-deep); color:#fdfaf3; padding:13px 20px; border-radius:12px; font-size:14px; font-weight:500;
+    box-shadow:0 12px 30px -8px rgba(38,53,40,.5); display:flex; align-items:center; gap:10px;
+    animation:toastin .3s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .toast.err{ background:var(--terra); }
+  @keyframes toastin{ from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:none;} }
+
+  footer{ text-align:center; margin-top:56px; color:var(--ink-faint); font-size:13px; }
+  footer a{ color:var(--green); text-decoration:none; border-bottom:1px dotted var(--green); }
+
+  @media (max-width:520px){
+    .two{ grid-template-columns:1fr; }
+    .toolbar{ top:8px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Catálogo Botânico · desde 2026</div>
+      <h1>Herbário <em>Digital</em></h1>
+      <p class="sub">Um catálogo vivo das suas plantas — cada espécie avisa, na hora certa, quando é dia de regar. 🌿</p>
+      <div class="rule"><span>❦</span></div>
+      <div class="stats">
+        <div class="stat"><b id="statTotal">0</b><small>Plantas</small></div>
+        <div class="stat thirsty"><b id="statThirsty">0</b><small>Com sede</small></div>
+        <div class="stat"><b id="statOk">0</b><small>Hidratadas</small></div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="search" type="text" placeholder="Buscar por nome ou espécie…" autocomplete="off" />
+      </div>
+      <div class="toggle" id="thirstyToggle" role="button" tabindex="0">
+        <span class="dot"></span> Só as que precisam de água
+      </div>
+      <button class="btn btn-primary" id="addBtn">＋ Nova planta</button>
+    </div>
+
+    <div id="content">
+      <div class="loading"><span class="big">🌱</span><p>Carregando o herbário…</p></div>
+    </div>
+
+    <footer>
+      Interface do <strong>Catálogo de Plantas</strong> · consumindo a API FastAPI + MongoDB ·
+      <a href="/docs" target="_blank">ver documentação técnica</a>
+    </footer>
+  </div>
+
+  <!-- Modal cadastrar / editar -->
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div class="kicker" id="modalKicker">Nova ficha</div>
+        <h2 id="modalTitle">Cadastrar planta</h2>
+      </div>
+      <form id="plantForm">
+        <input type="hidden" id="plantId" />
+        <div class="field">
+          <label for="f_nome">Nome da planta *</label>
+          <input id="f_nome" required placeholder="Ex.: Jiboia" />
+        </div>
+        <div class="field">
+          <label for="f_especie">Espécie *</label>
+          <input id="f_especie" required placeholder="Ex.: Epipremnum aureum" />
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="f_freq">Regar a cada (dias) *</label>
+            <input id="f_freq" type="number" min="1" required placeholder="4" />
+          </div>
+          <div class="field">
+            <label for="f_sol">Exposição ao sol</label>
+            <input id="f_sol" list="sols" placeholder="Meia-sombra" />
+            <datalist id="sols"><option>Sol pleno</option><option>Meia-sombra</option><option>Sombra</option></datalist>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f_amb">Ambiente</label>
+          <input id="f_amb" list="ambs" placeholder="Interno" />
+          <datalist id="ambs"><option>Interno</option><option>Externo</option><option>Varanda</option><option>Jardim</option></datalist>
+        </div>
+        <div class="field">
+          <label for="f_obs">Observações</label>
+          <textarea id="f_obs" placeholder="Dicas de cuidado, curiosidades…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Salvar planta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+<script>
+  const API = "/plantas";
+  const EMOJIS = ["🪴","🌿","🌱","🌵","🌴","🍀","🌷","🌻","🌾","🎋","🌺","🍃","🌸","🪷"];
+  let plants = [];
+  let query = "";
+  let onlyThirsty = false;
+
+  const $ = (s) => document.querySelector(s);
+  const content = $("#content");
+
+  function emojiFor(name){
+    let h = 0; for (const c of (name||"")) h = (h*31 + c.charCodeAt(0)) >>> 0;
+    return EMOJIS[h % EMOJIS.length];
+  }
+  function esc(s){ return (s??"").toString().replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});}catch{ return "—"; } }
+
+  function toast(msg, type){
+    const t = document.createElement("div");
+    t.className = "toast" + (type==="err" ? " err":"");
+    t.innerHTML = (type==="err"?"⚠️ ":"✅ ") + msg;
+    $("#toasts").appendChild(t);
+    setTimeout(()=>{ t.style.transition="opacity .3s, transform .3s"; t.style.opacity=0; t.style.transform="translateY(10px)"; setTimeout(()=>t.remove(),300); }, 2600);
+  }
+
+  async function load(){
+    try{
+      const r = await fetch(`${API}/?quantidade=500`);
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      plants = await r.json();
+      render();
+    }catch(e){
+      content.innerHTML = `<div class="empty"><span class="big">🥀</span><h2>Não consegui falar com a API</h2>
+        <p>Verifique se o servidor está rodando (<code>uvicorn app.main:app --reload</code>).</p></div>`;
+    }
+  }
+
+  function updateStats(){
+    const thirsty = plants.filter(p=>p.precisa_de_rega).length;
+    $("#statTotal").textContent = plants.length;
+    $("#statThirsty").textContent = thirsty;
+    $("#statOk").textContent = plants.length - thirsty;
+  }
+
+  function render(){
+    updateStats();
+    let list = plants.slice().sort((a,b)=> (b.precisa_de_rega?1:0)-(a.precisa_de_rega?1:0));
+    if(query){
+      const q = query.toLowerCase();
+      list = list.filter(p => (p.nome||"").toLowerCase().includes(q) || (p.especie||"").toLowerCase().includes(q));
+    }
+    if(onlyThirsty) list = list.filter(p=>p.precisa_de_rega);
+
+    if(plants.length === 0){
+      content.innerHTML = `<div class="empty"><span class="big">🪴</span><h2>Seu herbário está vazio</h2>
+        <p>Que tal cadastrar a primeira planta? Clique em <strong>“＋ Nova planta”</strong>.</p></div>`;
+      return;
+    }
+    if(list.length === 0){
+      content.innerHTML = `<div class="empty"><span class="big">🔍</span><h2>Nenhuma planta encontrada</h2>
+        <p>Tente outro termo de busca${onlyThirsty?" ou desative o filtro de sede":""}.</p></div>`;
+      return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    list.forEach((p, i) => {
+      const el = document.createElement("article");
+      el.className = "card";
+      el.style.animationDelay = (i*45)+"ms";
+      const thirsty = p.precisa_de_rega;
+      el.innerHTML = `
+        <div class="splash">💧</div>
+        <div class="card-top">
+          <div class="avatar">${emojiFor(p.nome)}</div>
+          <div style="min-width:0">
+            <h3>${esc(p.nome)}</h3>
+            <div class="species">${esc(p.especie)||"espécie não informada"}</div>
+            <div class="badge ${thirsty?"thirsty":"ok"}"><span class="pulse"></span>${thirsty?"Precisa de água":"Hidratada"}</div>
+          </div>
+        </div>
+        <div class="attrs">
+          <div class="attr"><span class="ic">💧</span> Regar a cada <strong>&nbsp;${esc(p.frequencia_rega_dias)} dia(s)</strong></div>
+          <div class="attr"><span class="ic">☀️</span> ${esc(p.exposicao_solar)||"—"}</div>
+          <div class="attr"><span class="ic">🏡</span> ${esc(p.ambiente)||"—"}</div>
+          <div class="attr"><span class="ic">🗓️</span> Cadastrada em ${fmtDate(p.criado_em)}</div>
+        </div>
+        ${p.observacoes ? `<div class="obs">“${esc(p.observacoes)}”</div>` : ""}
+        <div class="actions">
+          <button class="water-btn" data-water="${p.id}">💧 Reguei agora</button>
+          <button class="icon-btn" data-edit="${p.id}" title="Editar">✏️</button>
+          <button class="icon-btn danger" data-del="${p.id}" title="Excluir">🗑️</button>
+        </div>`;
+      grid.appendChild(el);
+    });
+    content.innerHTML = "";
+    content.appendChild(grid);
+  }
+
+  // ---- Ações nos cards (delegação) ----
+  content.addEventListener("click", async (e)=>{
+    const water = e.target.closest("[data-water]");
+    const edit  = e.target.closest("[data-edit]");
+    const del   = e.target.closest("[data-del]");
+    if(water) return waterPlant(water.dataset.water, water);
+    if(edit)  return openModal("edit", plants.find(p=>p.id===edit.dataset.edit));
+    if(del)   return deletePlant(del.dataset.del);
+  });
+
+  async function waterPlant(id, btn){
+    const card = btn.closest(".card");
+    const splash = card.querySelector(".splash");
+    splash.classList.remove("go"); void splash.offsetWidth; splash.classList.add("go");
+    try{
+      const r = await fetch(`${API}/${id}/regar`, { method:"PATCH" });
+      if(!r.ok) throw new Error();
+      const updated = await r.json();
+      const idx = plants.findIndex(p=>p.id===id);
+      if(idx>=0) plants[idx] = updated;
+      setTimeout(()=>{ render(); }, 620);
+      toast("Rega registrada! 💦");
+    }catch{ toast("Não consegui registrar a rega.", "err"); }
+  }
+
+  async function deletePlant(id){
+    const p = plants.find(x=>x.id===id);
+    if(!confirm(`Excluir “${p?.nome||"esta planta"}” do catálogo?`)) return;
+    try{
+      const r = await fetch(`${API}/${id}`, { method:"DELETE" });
+      if(!r.ok) throw new Error();
+      plants = plants.filter(x=>x.id!==id);
+      render();
+      toast("Planta removida do herbário.");
+    }catch{ toast("Não consegui excluir.", "err"); }
+  }
+
+  // ---- Modal ----
+  const overlay = $("#overlay");
+  function openModal(mode, plant){
+    $("#plantForm").reset();
+    $("#plantId").value = "";
+    if(mode==="edit" && plant){
+      $("#modalKicker").textContent = "Editar ficha";
+      $("#modalTitle").textContent = "Editar planta";
+      $("#saveBtn").textContent = "Salvar alterações";
+      $("#plantId").value = plant.id;
+      $("#f_nome").value = plant.nome||"";
+      $("#f_especie").value = plant.especie||"";
+      $("#f_freq").value = plant.frequencia_rega_dias??"";
+      $("#f_sol").value = plant.exposicao_solar||"";
+      $("#f_amb").value = plant.ambiente||"";
+      $("#f_obs").value = plant.observacoes||"";
+    }else{
+      $("#modalKicker").textContent = "Nova ficha";
+      $("#modalTitle").textContent = "Cadastrar planta";
+      $("#saveBtn").textContent = "Salvar planta";
+    }
+    overlay.classList.add("show");
+    setTimeout(()=>$("#f_nome").focus(), 120);
+  }
+  function closeModal(){ overlay.classList.remove("show"); }
+
+  $("#addBtn").addEventListener("click", ()=>openModal("new"));
+  $("#cancelBtn").addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e)=>{ if(e.target===overlay) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
+
+  $("#plantForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const id = $("#plantId").value;
+    const payload = {
+      nome: $("#f_nome").value.trim(),
+      especie: $("#f_especie").value.trim(),
+      frequencia_rega_dias: parseInt($("#f_freq").value, 10),
+      exposicao_solar: $("#f_sol").value.trim(),
+      ambiente: $("#f_amb").value.trim(),
+      observacoes: $("#f_obs").value.trim() || null,
+    };
+    const saveBtn = $("#saveBtn");
+    saveBtn.disabled = true; saveBtn.textContent = "Salvando…";
+    try{
+      let r;
+      if(id){ r = await fetch(`${API}/${id}`, { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); }
+      else  { r = await fetch(`${API}/`,     { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); }
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      closeModal();
+      toast(id ? "Planta atualizada! 🌿" : "Planta cadastrada! 🌱");
+      await load();
+    }catch(err){
+      toast("Erro ao salvar. Confira os campos obrigatórios.", "err");
+    }finally{
+      saveBtn.disabled = false; saveBtn.textContent = id ? "Salvar alterações" : "Salvar planta";
+    }
+  });
+
+  // ---- Busca e filtro ----
+  $("#search").addEventListener("input", (e)=>{ query = e.target.value; render(); });
+  const tt = $("#thirstyToggle");
+  function toggleThirsty(){ onlyThirsty = !onlyThirsty; tt.classList.toggle("on", onlyThirsty); render(); }
+  tt.addEventListener("click", toggleThirsty);
+  tt.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleThirsty(); } });
+
+  load();
+</script>
+</body>
+</html>
