@@ -1,6 +1,6 @@
 # 🌱 API de Catálogo de Plantas
 
-Uma API REST para cadastrar, organizar e acompanhar as necessidades de cuidado das suas plantas — com cálculo automático de quando cada uma precisa ser regada.
+Uma API REST para cadastrar, organizar e acompanhar as necessidades de cuidado das suas plantas, com cálculo automático de quando cada uma precisa ser regada.
 
 Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **MongoDB (via Beanie ODM)**, seguindo uma arquitetura em camadas.
 
@@ -8,7 +8,7 @@ Projeto desenvolvido como estudo prático de **FastAPI**, **Pydantic** e **Mongo
 
 ## 🎯 Sobre o projeto
 
-Quem tem plantas em casa sabe: cada espécie tem uma necessidade diferente de rega, luz e ambiente, e é fácil perder o controle de qual planta precisa de cuidado e quando. Este projeto nasceu como uma solução simples para esse problema — um catálogo pessoal onde cada planta cadastrada informa automaticamente se já está na hora de regar.
+Quem tem plantas em casa sabe: cada espécie tem uma necessidade diferente de rega, luz e ambiente, e é fácil perder o controle de qual planta precisa de cuidado e quando. Este projeto nasceu como uma solução simples para esse problema, se trata de um catálogo pessoal onde cada planta cadastrada informa automaticamente se já está na hora de regar.
 
 Mais do que uma aplicação funcional, este projeto foi construído como exercício de aprendizado de **arquitetura em camadas** aplicada a uma API real, com ênfase em separação de responsabilidades, validação de dados e boas práticas com bancos NoSQL.
 
@@ -46,7 +46,7 @@ Cliente (requisição HTTP)
       MongoDB
 ```
 
-Essa separação torna o código mais fácil de manter, testar e evoluir — por exemplo, seria possível trocar o banco de dados sem alterar a lógica de negócio, já que o _service_ nunca acessa o banco diretamente.
+Essa separação torna o código mais fácil de manter, testar e evoluir, por exemplo, seria possível trocar o banco de dados sem alterar a lógica de negócio, já que o _service_ nunca acessa o banco diretamente.
 
 ### Estrutura de pastas
 
@@ -158,7 +158,7 @@ Ali você encontra todos os endpoints disponíveis, já com uma interface pronta
 | `PATCH`  | `/plantas/{id}/regar` | Marca a planta como regada agora       |
 | `DELETE` | `/plantas/{id}`       | Remove uma planta                      |
 
-### Exemplo de requisição — cadastrar planta
+### Exemplo de requisição (cadastrar planta)
 
 ```json
 POST /plantas/
